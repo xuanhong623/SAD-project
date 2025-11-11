@@ -29,4 +29,5 @@ public class Plan {
     public String getArrivalTime() {
         return arrivalTime;
     }
+
 }
