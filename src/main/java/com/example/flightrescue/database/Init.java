@@ -1,5 +1,6 @@
 package com.example.flightrescue.database;
 
+import com.example.flightrescue.model.Flight;
 import com.google.api.core.ApiFuture;
 import com.google.auth.oauth2.GoogleCredentials;
 import com.google.cloud.firestore.DocumentReference;
@@ -15,18 +16,18 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.ExecutionException;
 import java.io.IOException;
+import java.time.LocalDateTime;
 
 public class Init {
 
     private Firestore db;
 
     // 初始化資料庫
-    public void init() throws IOException {
+    public Firestore init() throws IOException {
         // 用 ClassLoader 從 resources 讀取
         InputStream serviceAccount = Init.class
                 .getClassLoader()
                 .getResourceAsStream("serviceAccountKey.json");
-
 
         FirebaseOptions options = FirebaseOptions.builder()
                 .setCredentials(GoogleCredentials.fromStream(serviceAccount))
@@ -39,11 +40,27 @@ public class Init {
         System.out.println("Firebase 成功初始化！");
 
         this.db = db;
-        }
+
+        return db;
+    }
     
+    public static void main(String[] args){
+        //Flight flight = new Flight(1L, "Taipei", "Tokyo"));
+        Init init = new Init();
+        Firestore db;
+        try{
+        db = init.init();
+    
+        Flight flight = new Flight(1L, "Taipei", "Tokyo", LocalDateTime.now());
+        db.collection("Flights").document("flight001").set(flight);
+    }
+        catch(IOException e){
+            e.printStackTrace();
+        }
+
+    }
 
     //下面是Sample
-
 
     public void CreateDataSample() throws Exception{
         
@@ -94,5 +111,6 @@ public class Init {
         }
     }
 
+    
 }
 
