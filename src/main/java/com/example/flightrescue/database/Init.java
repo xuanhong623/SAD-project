@@ -1,5 +1,11 @@
 package com.example.flightrescue.database;
 
+import java.io.IOException;
+import java.io.InputStream;
+import java.time.LocalDateTime;
+import java.util.HashMap;
+import java.util.Map;
+
 import com.example.flightrescue.model.Flight;
 import com.google.api.core.ApiFuture;
 import com.google.auth.oauth2.GoogleCredentials;
@@ -10,13 +16,6 @@ import com.google.cloud.firestore.WriteResult;
 import com.google.firebase.FirebaseApp;
 import com.google.firebase.FirebaseOptions;
 import com.google.firebase.cloud.FirestoreClient;
-
-import java.io.InputStream;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.concurrent.ExecutionException;
-import java.io.IOException;
-import java.time.LocalDateTime;
 
 public class Init {
 
@@ -43,21 +42,30 @@ public class Init {
 
         return db;
     }
-    
+
+
     public static void main(String[] args){
         //Flight flight = new Flight(1L, "Taipei", "Tokyo"));
         Init init = new Init();
         Firestore db;
         try{
         db = init.init();
-    
-        Flight flight = new Flight(1L, "Taipei", "Tokyo", LocalDateTime.now());
-        db.collection("Flights").document("flight001").set(flight);
+        init.CreateFlightDataSample();
     }
-        catch(IOException e){
+        catch(Exception e){
             e.printStackTrace();
         }
 
+    }
+
+    public void CreateFlightDataSample() throws Exception{
+        
+        Flight flight = new Flight(1L, "Taipei", "Tokyo", LocalDateTime.now());
+
+        // 🔹 將資料存進 Firestore（集合名稱：Flights）
+        ApiFuture<WriteResult> result = db.collection("Flights").document("flight001").set(flight);
+        
+        System.out.println("寫入成功，時間：" + result.get().getUpdateTime());
     }
 
     //下面是Sample
@@ -110,7 +118,5 @@ public class Init {
             System.out.println("❌ 找不到文件！");
         }
     }
-
-    
 }
 
