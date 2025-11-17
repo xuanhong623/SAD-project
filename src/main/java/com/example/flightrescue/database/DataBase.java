@@ -22,8 +22,13 @@ public class DataBase {
 
     private Firestore db;
 
-
+    //簡介
     // 要使用這個DataBase一定要初始化，真的
+    // 目前都只有使用者資料庫
+    // 要Flight的話，我再弄，找我就行
+    // 嘿嘿嘿ㄏㄟ ，我要寫到中風了
+
+
     // 初始化資料庫，只要執行一次，但一定要
     public void Init() throws IOException {
         // 用 ClassLoader 從 resources 讀取
@@ -44,23 +49,8 @@ public class DataBase {
         this.db = db;
     }
 
-    //建立資料使用，後續不要理這段
-    // public static void main(String[] args) {
-    //     Init init = new Init();
-    //     try {
-    //         init.init();
-    //         init.CreateUserData();
-    //         init.ReadUserData("demo001");
-    //         // init.CreateDataSample();
-    //         // init.InputDataSample();
-    //         // init.ReadDataSample();
-    //     } catch (Exception e) {
-    //         e.printStackTrace();
-    //     }
-    // }
-
     //建立使用者資料庫
-    //不要這個，這個我已經建立過一次了，所以不要用
+    //不要用這個，這個我已經建立過一次了，所以不要用
     public void CreateUserData() throws Exception {
         // Firestore 自動將物件轉成文件欄位
         db.collection("users").document("demo001").set(new User("demo001", "王小明", "大阪難波飯店", "大阪市中央區xxxx路", 1L)).get();
@@ -155,6 +145,25 @@ public class DataBase {
             System.out.println("❌ 找不到文件！");
         }
     }
+
+        //建立資料使用，後續不要理這段
+    // public static void main(String[] args) {
+    //     Init init = new Init();
+    //     try {
+    //         init.init();
+    //         init.CreateUserData();
+    //         init.ReadUserData("demo001");
+    //         // init.CreateDataSample();
+    //         // init.InputDataSample();
+    //         // init.ReadDataSample();
+    //     } catch (Exception e) {
+    //         e.printStackTrace();
+    //     }
+    // }
+
+
+
+
 
     //就說不用看，看甚麼，給我上去
 }
