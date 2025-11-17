@@ -1,5 +1,7 @@
 package com.example.flightrescue.database;
 
+import com.example.flightrescue.model.User;
+import com.example.flightrescue.storage.InMemoryData;
 import com.google.api.core.ApiFuture;
 import com.google.auth.oauth2.GoogleCredentials;
 import com.google.cloud.firestore.DocumentReference;
@@ -39,11 +41,60 @@ public class Init {
         System.out.println("Firebase 成功初始化！");
 
         this.db = db;
-        }
+    }
     
+    public static void main(String[] args) {
+        Init init = new Init();
+        try {
+            init.init();
+            init.CreateUserData();
+            init.ReadUserData();
+            // init.CreateDataSample();
+            // init.InputDataSample();
+            // init.ReadDataSample();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    public void CreateUserData() throws Exception{
+        // 使用者資料
+                // InMemoryData.users.add(new User("demo001", "王小明", "大阪難波飯店", "大阪市中央區xxxx路", 1L));
+                // InMemoryData.users.add(new User("demo002", "陳美玲", "東京新宿飯店", "東京都新宿區xxxx路", 2L));
+                // InMemoryData.users.add(new User("demo003", "林志宏", "名古屋榮飯店", "名古屋市中區xxxx路", 3L));
+                // InMemoryData.users.add(new User("demo004", "張雅惠", "福岡天神飯店", "福岡市中央區xxxx路", 4L));
+                // InMemoryData.users.add(new User("demo005", "李建國", "札幌大通飯店", "札幌市中央區xxxx路", 5L));
+                // InMemoryData.users.add(new User("demo006", "黃俊傑", "沖繩國際通飯店", "那霸市牧志xxxx路", 6L));
+                // InMemoryData.users.add(new User("demo007", "周怡君", "京都四條飯店", "京都市中京區xxxx路", 7L));
+                // InMemoryData.users.add(new User("demo008", "蔡宗翰", "橫濱海濱飯店", "橫濱市中區xxxx路", 8L));
+                // InMemoryData.users.add(new User("demo009", "許淑芬", "神戶三宮飯店", "神戶市中央區xxxx路", 9L));
+                // InMemoryData.users.add(new User("demo010", "吳宗賢", "金澤車站飯店", "金澤市此花町xxxx路", 10L));
+                // // 新增一個沒有航班資料的帳號 demo999，登入後會被導向資料輸入頁
+                // InMemoryData.users.add(new User("demo999"));
+                // InMemoryData.users.add(new User("demo998"));
+                // InMemoryData.users.add(new User("demo997"));
+                // InMemoryData.users.add(new User("demo996"));
+                // InMemoryData.users.add(new User("demo995"));
+
+        // Firestore 自動將物件轉成文件欄位
+        db.collection("users").document("demo001").set(new User("demo001", "王小明", "大阪難波飯店", "大阪市中央區xxxx路", 1L)).get();
+
+        System.out.println("使用者資料建立成功！");
+
+    }
+
+    public void ReadUserData() throws Exception{
+        DocumentSnapshot doc = db.collection("users").document("demo001").get().get();
+
+        if (doc.exists()) {
+            User u = doc.toObject(User.class);
+            System.out.println("成功轉回物件");
+        } else {
+            System.out.println("❌ 找不到文件！");
+        }
+    }
 
     //下面是Sample
-
 
     public void CreateDataSample() throws Exception{
         
