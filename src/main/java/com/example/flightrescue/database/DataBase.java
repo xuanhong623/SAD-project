@@ -18,14 +18,16 @@ import java.util.Map;
 import java.util.concurrent.ExecutionException;
 import java.io.IOException;
 
-public class Init {
+public class DataBase {
 
     private Firestore db;
 
-    // 初始化資料庫
-    public void init() throws IOException {
+
+    // 要使用這個DataBase一定要初始化，真的
+    // 初始化資料庫，只要執行一次，但一定要
+    public void Init() throws IOException {
         // 用 ClassLoader 從 resources 讀取
-        InputStream serviceAccount = Init.class
+        InputStream serviceAccount = DataBase.class
                 .getClassLoader()
                 .getResourceAsStream("serviceAccountKey.json");
 
@@ -58,6 +60,7 @@ public class Init {
     // }
 
     //建立使用者資料庫
+    //不要這個，這個我已經建立過一次了，所以不要用
     public void CreateUserData() throws Exception {
         // Firestore 自動將物件轉成文件欄位
         db.collection("users").document("demo001").set(new User("demo001", "王小明", "大阪難波飯店", "大阪市中央區xxxx路", 1L)).get();
@@ -81,7 +84,7 @@ public class Init {
 
     }
 
-    //讀取使用者資料庫
+    //讀取使用者資料庫：就是String你要的使用者名稱，就會回傳一個User物件
     public User ReadUserData(String user /*使用者的username*/) throws Exception {
         DocumentSnapshot doc = db.collection("users").document(user).get().get();
 
@@ -95,13 +98,14 @@ public class Init {
         }
     }
 
-    //新增使用者資料
+    //新增使用者資料：顧名思義，輸入一個User物件進去就會新增
+    //如果有同樣username的話會覆蓋，不用擔心
     public void InputUserData(User user) throws Exception {
         db.collection("users").document(user.getUsername()).set(user).get();
         System.out.println("使用者資料輸入成功！");
     }
 
-    // 下面是Sample
+    // 下面是Sample，你們不用管這些，我給我自己看得
 
     public void CreateDataSample() throws Exception {
 
@@ -152,4 +156,5 @@ public class Init {
         }
     }
 
+    //就說不用看，看甚麼，給我上去
 }
