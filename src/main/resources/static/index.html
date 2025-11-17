@@ -4,7 +4,7 @@
 <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <title>飛常順 MVP 主頁</title>
+    <title>飛常不順｜主頁</title>
     <style>
         :root {
             font-family: ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto;
@@ -42,13 +42,22 @@
             align-items: center;
         }
 
-        input[type="number"] {
+        input[type="number"],
+        input[type="text"],
+        input[type="password"],
+        input[type="range"] {
             background: #0f172a;
             border: 1px solid #374151;
             color: #e5e7eb;
             border-radius: 10px;
             padding: 10px 12px;
-            width: 120px;
+        }
+
+        input[type="range"] {
+            padding: 0;
+            height: 6px;
+            border-radius: 999px;
+            cursor: pointer;
         }
 
         button {
@@ -82,6 +91,7 @@
             text-align: left;
             padding: 12px 10px;
             border-bottom: 1px solid #1f2937;
+            vertical-align: top;
         }
 
         th {
@@ -139,83 +149,404 @@
                 grid-template-columns: 1fr 1fr;
             }
         }
+
+        .input-label {
+            min-width: 100px;
+        }
+
+        .field-note {
+            font-size: 12px;
+            color: #9ca3af;
+            margin-top: 4px;
+        }
     </style>
 </head>
 
 <body>
     <div class="wrap">
         <div class="card">
-            <h1>飛常不順｜主頁</h1>
-            <div class="row">
-                <label for="flightId">Flight ID</label>
-                <input id="flightId" type="number" value="1" min="1" />
-                <button id="refreshBtn">立即更新</button>
-                <span class="badge" id="autoBadge">自動更新中</span>
+            <!-- 登入區 -->
+            <div id="loginSection">
+                <h1>飛常不順｜登入</h1>
+                <div class="row" style="margin-bottom:12px;">
+                    <label style="min-width:80px;">帳號</label>
+                    <input id="username" type="text" value="demo" style="flex:1;max-width:200px;" />
+                </div>
+                <div class="row" style="margin-bottom:12px;">
+                    <label style="min-width:80px;">密碼</label>
+                    <input id="password" type="password" value="1234" style="flex:1;max-width:200px;" />
+                </div>
+                <button id="loginBtn">登入</button>
+                <div class="status" id="loginStatus">Demo 帳號：demo / 1234</div>
             </div>
 
-            <div class="banner" id="banner">
-                系統會每 5 秒檢查備援方案。偵測到延誤後，這裡會顯示建議方案。
+            <!-- 航班資料輸入頁（尚未填資料的使用者登入後顯示） -->
+            <div id="profileSection" style="display:none;">
+                <h1>設定航班與飯店資料</h1>
+
+                <!-- 返回登入按鈕 -->
+                <div class="row" style="margin-bottom:12px; justify-content:flex-end;">
+                    <button id="backToLoginFromProfile" type="button">返回登入</button>
+                </div>
+
+                <div class="row" style="margin-bottom:12px;">
+                    <label style="min-width:80px;">姓名</label>
+                    <input id="profileFullName" type="text" style="flex:1;max-width:260px;" />
+                </div>
+
+                <div class="row" style="margin-bottom:12px;">
+                    <label style="min-width:80px;">飯店名稱</label>
+                    <input id="profileHotelName" type="text" style="flex:1;max-width:260px;" />
+                </div>
+
+                <div class="row" style="margin-bottom:12px;">
+                    <label style="min-width:80px;">飯店地址</label>
+                    <input id="profileHotelAddress" type="text" style="flex:1;max-width:260px;" />
+                </div>
+
+                <div class="row" style="margin-bottom:12px;">
+                    <label style="min-width:80px;">綁定航班 ID</label>
+                    <input id="profileFlightId" type="number" min="1" style="flex:1;max-width:120px;" />
+                </div>
+
+                <button id="profileSaveBtn">儲存資料</button>
+                <div class="status" id="profileStatus">請輸入您的航班與飯店資料</div>
             </div>
 
-            <div class="grid">
-                <div>
-                    <div class="k">航班狀態</div>
-                    <div class="v" id="flightStatus">未知</div>
+            <!-- 主頁區（登入後顯示） -->
+            <div id="mainSection" style="display:none;">
+                <div class="row" style="justify-content:space-between;align-items:center;margin-bottom:8px;">
+                    <h1 style="margin-bottom:0;">飛常不順｜主頁</h1>
+                    <!-- 主頁返回登入按鈕 -->
+                    <button id="backToLoginFromMain" type="button">返回登入</button>
                 </div>
-                <div>
-                    <div class="k">方案筆數</div>
-                    <div class="v" id="planCount">0</div>
+
+                <!-- 使用者 / 航班資訊 -->
+                <div class="banner" id="userBanner">
+                    <div id="userInfo">使用者資訊載入中…</div>
                 </div>
-                <div>
-                    <div class="k">上次更新</div>
-                    <div class="v" id="lastUpdated">—</div>
+
+                <div class="grid">
+                    <div>
+                        <div class="k">航班狀態</div>
+                        <div class="v" id="flightStatus">未知</div>
+                    </div>
+                    <div>
+                        <div class="k">方案筆數</div>
+                        <div class="v" id="planCount">0</div>
+                    </div>
+                    <div>
+                        <div class="k">上次更新</div>
+                        <div class="v" id="lastUpdated">—</div>
+                    </div>
+                </div>
+
+                <!-- 價格拉桿區：設定最高可接受價格 -->
+                <div class="row" style="margin-top:16px;">
+                    <label style="min-width:80px;">價格上限</label>
+                    <input id="priceSlider" type="range" min="0" max="20000" step="500" value="20000"
+                        style="flex:1;max-width:260px;" />
+                    <span class="badge" id="priceLabel">不限</span>
+                </div>
+                <div class="status" id="priceStatus">拖曳拉桿，可只顯示小於等於指定金額的方案。</div>
+
+                <div class="status" id="statusText">等待資料…</div>
+
+                <!-- 每一列 = 一個「航班+鐵路+飯店」組合 -->
+                <table id="plansTable" style="display:none;">
+                    <thead>
+                        <tr>
+                            <th>方案</th>
+                            <th>內容</th>
+                            <th>預估抵達</th>
+                            <th>費用</th>
+                            <th>動作</th>
+                        </tr>
+                    </thead>
+                    <tbody id="plansBody"></tbody>
+                </table>
+            </div>
+
+            <!-- 方案詳情頁（使用者選擇某方案後顯示） -->
+            <div id="planDetailSection" style="display:none;">
+                <h1>方案詳情</h1>
+
+                <div class="banner">
+                    <div class="k">選擇的方案</div>
+                    <div class="v" id="detailPlanType">—</div>
+                </div>
+
+                <div class="banner">
+                    <div class="k">預估抵達時間</div>
+                    <div class="v" id="detailArrivalTime">—</div>
+                </div>
+
+                <div class="banner">
+                    <div class="k">總費用</div>
+                    <div class="v" id="detailCost">—</div>
+                </div>
+
+                <div class="banner">
+                    <div class="k">方案內容</div>
+                    <pre id="detailContent" style="margin:0;font-size:14px;white-space:pre-wrap;">—</pre>
+                </div>
+
+                <div class="row" style="margin-top:16px;justify-content:space-between;">
+                    <button id="backToMainFromDetail" type="button">返回主頁</button>
+                    <!-- 進入付款按鈕 -->
+                    <button id="goToPaymentBtn" type="button">進入付款</button>
                 </div>
             </div>
 
-            <div class="status" id="statusText">等待資料…</div>
+            <!-- 付款頁面（模擬綠界信用卡付款） -->
+            <div id="paymentSection" style="display:none;">
+                <h1>信用卡付款（Demo）</h1>
 
-            <table id="plansTable" style="display:none;">
-                <thead>
-                    <tr>
-                        <th>方案</th>
-                        <th>預估抵達</th>
-                        <th>費用</th>
-                        <th>動作</th>
-                    </tr>
-                </thead>
-                <tbody id="plansBody"></tbody>
-            </table>
+                <!-- 付款表單區 -->
+                <div id="paymentFormArea">
+                    <div class="banner">
+                        <div class="k">訂單資訊</div>
+                        <div id="payOrderInfo" class="v">—</div>
+                    </div>
+
+                    <div class="banner">
+                        <div class="k">應付金額</div>
+                        <div class="v" id="payAmount">—</div>
+                    </div>
+
+                    <div class="status" style="margin-top:16px;">
+                        以下為模擬一般綠界（ECPay）信用卡付款頁面，實際串接時會導向綠界正式頁面。
+                    </div>
+
+                    <div style="margin-top:16px;">
+                        <div class="row" style="margin-bottom:12px;">
+                            <label class="input-label">信用卡卡號</label>
+                            <input id="payCardNumber" type="text" inputmode="numeric" maxlength="19"
+                                placeholder="**** **** **** ****" style="flex:1;max-width:260px;" />
+                        </div>
+                        <div class="field-note">請輸入 16 碼信用卡號（Demo，不送出真實資料）。</div>
+
+                        <div class="row" style="margin:12px 0;">
+                            <label class="input-label">有效期限</label>
+                            <input id="payCardExpiry" type="text" placeholder="MM/YY" style="flex:1;max-width:120px;" />
+                        </div>
+
+                        <div class="row" style="margin:12px 0;">
+                            <label class="input-label">安全碼</label>
+                            <input id="payCardCvv" type="text" inputmode="numeric" maxlength="4" placeholder="CVV"
+                                style="flex:1;max-width:120px;" />
+                        </div>
+
+                        <div class="row" style="margin:12px 0;">
+                            <label class="input-label">持卡人姓名</label>
+                            <input id="payCardHolder" type="text" placeholder="CARD HOLDER NAME"
+                                style="flex:1;max-width:260px;" />
+                        </div>
+                    </div>
+
+                    <div class="row" style="margin-top:16px;justify-content:space-between;">
+                        <button id="backToDetailFromPayment" type="button">返回方案詳情</button>
+                        <button id="paySubmitBtn" type="button">確認付款（Demo）</button>
+                    </div>
+
+                    <div class="status" id="payStatus">此為示範畫面，不會真的進行扣款。</div>
+                </div>
+
+                <!-- 付款結果區（付款成功後顯示） -->
+                <div id="paymentResultArea" style="display:none;margin-top:16px;">
+                    <div class="banner">
+                        <div class="k">付款狀態</div>
+                        <div class="v" id="payResultStatus">付款成功，感謝您的使用。</div>
+                    </div>
+
+                    <div class="banner">
+                        <div class="k">方案名稱</div>
+                        <div class="v" id="payResultPlanType">—</div>
+                    </div>
+
+                    <div class="banner">
+                        <div class="k">預估抵達時間</div>
+                        <div class="v" id="payResultArrivalTime">—</div>
+                    </div>
+
+                    <div class="banner">
+                        <div class="k">付款金額</div>
+                        <div class="v" id="payResultCost">—</div>
+                    </div>
+
+                    <div class="banner">
+                        <div class="k">方案內容</div>
+                        <pre id="payResultContent" style="margin:0;font-size:14px;white-space:pre-wrap;">—</pre>
+                    </div>
+
+                    <div class="row" style="margin-top:16px;justify-content:flex-end;">
+                        <button id="backToMainFromPaymentResult" type="button">返回主頁</button>
+                    </div>
+                </div>
+            </div>
         </div>
     </div>
 
     <script>
-        const API_BASE = ''; // 同網域部署，留空即可。若不同網域，設成 'http://localhost:8080'
+        const API_BASE = ''; // 同網域部署
         const POLL_MS = 5000;
 
         const el = {
-            flightId: document.getElementById('flightId'),
-            refreshBtn: document.getElementById('refreshBtn'),
-            autoBadge: document.getElementById('autoBadge'),
+            // 區塊
+            loginSection: document.getElementById('loginSection'),
+            mainSection: document.getElementById('mainSection'),
+            profileSection: document.getElementById('profileSection'),
+            planDetailSection: document.getElementById('planDetailSection'),
+            paymentSection: document.getElementById('paymentSection'),
+
+            paymentFormArea: document.getElementById('paymentFormArea'),
+            paymentResultArea: document.getElementById('paymentResultArea'),
+
+            // 登入相關
+            username: document.getElementById('username'),
+            password: document.getElementById('password'),
+            loginBtn: document.getElementById('loginBtn'),
+            loginStatus: document.getElementById('loginStatus'),
+
+            // 主畫面
+            userInfo: document.getElementById('userInfo'),
+            flightStatus: document.getElementById('flightStatus'),
+            planCount: document.getElementById('planCount'),
+            lastUpdated: document.getElementById('lastUpdated'),
             statusText: document.getElementById('statusText'),
             plansTable: document.getElementById('plansTable'),
             plansBody: document.getElementById('plansBody'),
-            banner: document.getElementById('banner'),
-            planCount: document.getElementById('planCount'),
-            lastUpdated: document.getElementById('lastUpdated'),
-            flightStatus: document.getElementById('flightStatus'),
+            priceSlider: document.getElementById('priceSlider'),
+            priceLabel: document.getElementById('priceLabel'),
+            priceStatus: document.getElementById('priceStatus'),
+
+            // 資料輸入頁
+            profileFullName: document.getElementById('profileFullName'),
+            profileHotelName: document.getElementById('profileHotelName'),
+            profileHotelAddress: document.getElementById('profileHotelAddress'),
+            profileFlightId: document.getElementById('profileFlightId'),
+            profileSaveBtn: document.getElementById('profileSaveBtn'),
+            profileStatus: document.getElementById('profileStatus'),
+
+            // 返回登入按鈕
+            backToLoginFromProfile: document.getElementById('backToLoginFromProfile'),
+            backToLoginFromMain: document.getElementById('backToLoginFromMain'),
+
+            // 方案詳情元素
+            detailPlanType: document.getElementById('detailPlanType'),
+            detailArrivalTime: document.getElementById('detailArrivalTime'),
+            detailCost: document.getElementById('detailCost'),
+            detailContent: document.getElementById('detailContent'),
+            backToMainFromDetail: document.getElementById('backToMainFromDetail'),
+            goToPaymentBtn: document.getElementById('goToPaymentBtn'),
+
+            // 付款頁元素
+            payOrderInfo: document.getElementById('payOrderInfo'),
+            payAmount: document.getElementById('payAmount'),
+            payCardNumber: document.getElementById('payCardNumber'),
+            payCardExpiry: document.getElementById('payCardExpiry'),
+            payCardCvv: document.getElementById('payCardCvv'),
+            payCardHolder: document.getElementById('payCardHolder'),
+            backToDetailFromPayment: document.getElementById('backToDetailFromPayment'),
+            paySubmitBtn: document.getElementById('paySubmitBtn'),
+            payStatus: document.getElementById('payStatus'),
+
+            // 付款結果元素
+            payResultStatus: document.getElementById('payResultStatus'),
+            payResultPlanType: document.getElementById('payResultPlanType'),
+            payResultArrivalTime: document.getElementById('payResultArrivalTime'),
+            payResultCost: document.getElementById('payResultCost'),
+            payResultContent: document.getElementById('payResultContent'),
+            backToMainFromPaymentResult: document.getElementById('backToMainFromPaymentResult'),
         };
 
         let timer = null;
         let isFetching = false;
+        let currentUser = null;   // 登入成功後，存放 user
+        let allPlans = [];        // 目前抓到的所有方案
+        let priceFilterMax = null; // 價格上限
+        let selectedPlan = null;   // 使用者選擇的方案
+        let priceInitialized = false; // 價格拉桿是否已初始化
 
-        function fmtTwd(n) { return new Intl.NumberFormat('zh-Hant', { style: 'currency', currency: 'TWD', maximumFractionDigits: 0 }).format(n); }
-        function nowStr() { const d = new Date(); return d.toLocaleString('zh-Hant-TW'); }
+        function fmtTwd(n) {
+            return new Intl.NumberFormat('zh-Hant', {
+                style: 'currency',
+                currency: 'TWD',
+                maximumFractionDigits: 0
+            }).format(n);
+        }
 
+        function nowStr() {
+            const d = new Date();
+            return d.toLocaleString('zh-Hant-TW');
+        }
+
+        // 登入流程
+        async function doLogin() {
+            const body = {
+                username: el.username.value.trim(),
+                password: el.password.value
+            };
+            el.loginBtn.disabled = true;
+            el.loginStatus.textContent = '登入中…';
+
+            try {
+                const res = await fetch(`${API_BASE}/api/login`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
+                    body: JSON.stringify(body)
+                });
+                if (!res.ok) {
+                    throw new Error(res.status === 401 ? '帳號或密碼錯誤' : `HTTP ${res.status}`);
+                }
+                const user = await res.json();
+                currentUser = user;
+
+                el.loginSection.style.display = 'none';
+                el.planDetailSection.style.display = 'none';
+                el.paymentSection.style.display = 'none';
+
+                if (user.profileCompleted) {
+                    el.profileSection.style.display = 'none';
+                    el.mainSection.style.display = 'block';
+
+                    renderUserInfo(user);
+                    startAuto();
+                    el.loginStatus.textContent = '登入成功';
+                } else {
+                    el.mainSection.style.display = 'none';
+                    el.profileSection.style.display = 'block';
+
+                    el.profileFullName.value = user.fullName || '';
+                    el.profileHotelName.value = user.hotelName || '';
+                    el.profileHotelAddress.value = user.hotelAddress || '';
+                    el.profileFlightId.value = user.flightId != null ? user.flightId : '';
+
+                    el.profileStatus.textContent = '請先完成航班與飯店資料設定';
+                }
+            } catch (e) {
+                el.loginStatus.textContent = `登入失敗：${e.message}`;
+            } finally {
+                el.loginBtn.disabled = false;
+            }
+        }
+
+        function renderUserInfo(user) {
+            el.userInfo.innerHTML = `
+                <div><strong>${escapeHtml(user.fullName || user.username || '')}</strong></div>
+                <div>綁定航班：<span class="badge">Flight ${user.flightId}</span></div>
+                <div>飯店：${escapeHtml(user.hotelName || '—')}</div>
+                <div>地址：${escapeHtml(user.hotelAddress || '—')}</div>
+            `;
+        }
+
+        // 依照 currentUser 的 flightId 去查備援方案
         async function fetchPlans() {
+            if (!currentUser) return;
             if (isFetching) return;
             isFetching = true;
-            el.refreshBtn.disabled = true;
-            const flightId = Number(el.flightId.value || 1);
+
+            const flightId = currentUser.flightId;
             const url = `${API_BASE}/dashboard/plans/${flightId}`;
 
             try {
@@ -224,27 +555,74 @@
                 if (!res.ok) throw new Error(`HTTP ${res.status}`);
                 const data = await res.json();
 
-                renderPlans(data);
-                el.planCount.textContent = data.length;
+                allPlans = data || [];
+
+                // 第一次載入方案時初始化拉桿，之後只更新 min/max 並保留使用者選擇
+                updatePriceSliderRange(allPlans, { keepUserSelection: priceInitialized });
+                priceInitialized = true;
+
+                const filtered = applyPriceFilter();
+                renderPlans(filtered);
+
+                el.planCount.textContent = filtered.length;
                 el.lastUpdated.textContent = nowStr();
 
-                // 簡單推斷：有方案即視為延誤已觸發
-                el.flightStatus.innerHTML = data.length > 0
+                el.flightStatus.innerHTML = allPlans.length > 0
                     ? '<span class="ok">延誤已偵測，已產生方案</span>'
-                    : '<span class="warn">未偵測到延誤</span>';
+                    : '<span class="warn">尚未偵測到延誤</span>';
 
-                el.statusText.textContent = data.length > 0 ? '已更新' : '尚無方案，等待系統判定延誤…';
-                el.banner.style.display = data.length > 0 ? 'none' : 'block';
+                el.statusText.textContent = allPlans.length > 0 ? '已更新' : '尚無方案，等待系統判定延誤…';
             } catch (e) {
                 el.statusText.innerHTML = `<span class="err">讀取失敗：${e.message}</span>`;
                 el.flightStatus.innerHTML = '<span class="err">未知</span>';
                 el.plansTable.style.display = 'none';
+                allPlans = [];
             } finally {
-                el.refreshBtn.disabled = false;
                 isFetching = false;
             }
         }
 
+        // 根據目前方案，設定拉桿的 min / max
+        function updatePriceSliderRange(plans, { keepUserSelection = false } = {}) {
+            if (!plans || plans.length === 0) {
+                el.priceSlider.disabled = true;
+                el.priceLabel.textContent = '不限';
+                el.priceStatus.textContent = '目前沒有可用方案。';
+                priceFilterMax = null;
+                return;
+            }
+
+            const costs = plans.map(p => p.cost || 0);
+            const minCost = Math.min(...costs);
+            const maxCost = Math.max(...costs);
+
+            el.priceSlider.min = String(minCost);
+            el.priceSlider.max = String(maxCost);
+            el.priceSlider.step = '500';
+            el.priceSlider.disabled = (minCost === maxCost);
+
+            if (!keepUserSelection || priceFilterMax == null) {
+                // 第一次或尚未有使用者選擇 → 用最大值
+                priceFilterMax = maxCost;
+            } else {
+                // 之後輪詢 → 保留使用者選擇，但限制在新範圍內
+                if (priceFilterMax < minCost) priceFilterMax = minCost;
+                if (priceFilterMax > maxCost) priceFilterMax = maxCost;
+            }
+
+            el.priceSlider.value = String(priceFilterMax);
+            el.priceLabel.textContent = '≤ ' + fmtTwd(priceFilterMax);
+            el.priceStatus.textContent = '拖曳拉桿，可只顯示小於等於指定金額的方案。';
+        }
+
+        // 回傳套用價格上限後的方案清單
+        function applyPriceFilter() {
+            if (!allPlans || allPlans.length === 0) return [];
+            if (priceFilterMax == null) return allPlans;
+            return allPlans.filter(p => (p.cost || 0) <= priceFilterMax);
+        }
+
+        // 渲染方案列表
         function renderPlans(list) {
             if (!Array.isArray(list) || list.length === 0) {
                 el.plansTable.style.display = 'none';
@@ -253,52 +631,340 @@
             }
             el.plansTable.style.display = 'table';
             el.plansBody.innerHTML = list.map(p => `
-        <tr>
-          <td>${labelPlanType(p.planType)}</td>
-          <td>${escapeHtml(p.arrivalTime || '')}</td>
-          <td>${fmtTwd(p.cost || 0)}</td>
-          <td><button onclick="selectPlan('${p.planType}')">選擇</button></td>
-        </tr>
-      `).join('');
+                <tr>
+                  <td>${labelPlanType(p.planType)}</td>
+                  <td>
+                    <pre style="margin:0;font-size:12px;white-space:pre-wrap;">
+${escapeHtml(p.detail || '')}
+                    </pre>
+                  </td>
+                  <td>${escapeHtml(p.arrivalTime || '')}</td>
+                  <td>${fmtTwd(p.cost || 0)}</td>
+                  <td><button onclick="selectPlan('${p.planType}')">選擇</button></td>
+                </tr>
+            `).join('');
         }
 
         function labelPlanType(t) {
-            if (t === 'flight') return '改搭航班';
-            if (t === 'rail') return '改搭鐵路';
-            if (t === 'hotel') return '住宿＋隔日飛';
-            return t || '未知';
+            if (!t) return '方案';
+            return escapeHtml(t);
         }
 
         function escapeHtml(s) {
-            return String(s).replaceAll('&', '&amp;').replaceAll('<', '&lt;').replaceAll('>', '&gt;').replaceAll('"', '&quot;').replaceAll("'", "&#039;");
+            return String(s).replaceAll('&', '&amp;')
+                .replaceAll('<', '&lt;')
+                .replaceAll('>', '&gt;')
+                .replaceAll('"', '&quot;')
+                .replaceAll("'", "&#039;");
         }
 
-        // Demo 動作：僅顯示選擇結果，不呼叫後端下單
-        window.selectPlan = function (type) {
-            alert(`已選擇方案：${labelPlanType(type)}（Demo）`);
+        async function saveFlightProfile() {
+            if (!currentUser) {
+                return;
+            }
+
+            const body = {
+                fullName: el.profileFullName.value.trim(),
+                hotelName: el.profileHotelName.value.trim(),
+                hotelAddress: el.profileHotelAddress.value.trim(),
+                flightId: el.profileFlightId.value ? Number(el.profileFlightId.value) : null
+            };
+
+            if (!body.fullName || !body.hotelName || !body.hotelAddress || !body.flightId) {
+                el.profileStatus.innerHTML = '<span class="err">請完整填寫所有欄位</span>';
+                return;
+            }
+
+            el.profileSaveBtn.disabled = true;
+            el.profileStatus.textContent = '儲存中…';
+
+            try {
+                const res = await fetch(`${API_BASE}/api/users/${encodeURIComponent(currentUser.username)}/flight-profile`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Accept': 'application/json'
+                    },
+                    body: JSON.stringify(body)
+                });
+
+                if (!res.ok) {
+                    throw new Error(`HTTP ${res.status}`);
+                }
+
+                const user = await res.json();
+                currentUser = user;
+
+                el.profileSection.style.display = 'none';
+                el.planDetailSection.style.display = 'none';
+                el.paymentSection.style.display = 'none';
+                el.mainSection.style.display = 'block';
+
+                renderUserInfo(user);
+                startAuto();
+
+                el.statusText.textContent = '已載入航班與方案資料';
+            } catch (e) {
+                el.profileStatus.innerHTML = `<span class="err">儲存失敗：${e.message}</span>`;
+            } finally {
+                el.profileSaveBtn.disabled = false;
+            }
+        }
+
+        // 返回登入頁
+        function showLogin() {
+            stopAuto();
+            currentUser = null;
+            allPlans = [];
+            priceFilterMax = null;
+            selectedPlan = null;
+            priceInitialized = false;
+
+            el.loginSection.style.display = 'block';
+            el.profileSection.style.display = 'none';
+            el.mainSection.style.display = 'none';
+            el.planDetailSection.style.display = 'none';
+            el.paymentSection.style.display = 'none';
+
+            el.statusText.textContent = '等待資料…';
+            el.flightStatus.textContent = '未知';
+            el.planCount.textContent = '0';
+            el.lastUpdated.textContent = '—';
+            el.plansTable.style.display = 'none';
+            el.plansBody.innerHTML = '';
+
+            el.priceSlider.disabled = true;
+            el.priceLabel.textContent = '不限';
+            el.priceStatus.textContent = '拖曳拉桿，可只顯示小於等於指定金額的方案。';
+
+            el.profileStatus.textContent = '請輸入您的航班與飯店資料';
+            el.loginStatus.textContent = '請重新登入';
+
+            el.detailPlanType.textContent = '—';
+            el.detailArrivalTime.textContent = '—';
+            el.detailCost.textContent = '—';
+            el.detailContent.textContent = '—';
+
+            clearPaymentForm();
+            el.paymentFormArea.style.display = 'block';
+            el.paymentResultArea.style.display = 'none';
+            el.payStatus.textContent = '此為示範畫面，不會真的進行扣款。';
+        }
+
+        // 顯示方案詳情頁
+        function showPlanDetail(plan) {
+            selectedPlan = plan;
+            stopAuto();
+
+            el.detailPlanType.textContent = labelPlanType(plan.planType);
+            el.detailArrivalTime.textContent = plan.arrivalTime || '—';
+            el.detailCost.textContent = fmtTwd(plan.cost || 0);
+            el.detailContent.textContent = plan.detail || '—';
+
+            el.loginSection.style.display = 'none';
+            el.profileSection.style.display = 'none';
+            el.mainSection.style.display = 'none';
+            el.paymentSection.style.display = 'none';
+            el.planDetailSection.style.display = 'block';
+        }
+
+        // table 的「選擇」按鈕
+        window.selectPlan = function (planType) {
+            const plan = allPlans.find(p => p.planType === planType);
+            if (!plan) {
+                alert('找不到此方案資料');
+                return;
+            }
+            showPlanDetail(plan);
+        };
+
+        // 詳情頁返回主頁
+        function backToMainFromDetail() {
+            el.planDetailSection.style.display = 'none';
+            el.paymentSection.style.display = 'none';
+            if (currentUser && currentUser.profileCompleted) {
+                el.mainSection.style.display = 'block';
+                startAuto();
+            } else {
+                el.loginSection.style.display = 'block';
+            }
+        }
+
+        // 進入付款頁
+        function goToPayment() {
+            if (!selectedPlan) {
+                alert('尚未選擇方案');
+                return;
+            }
+
+            stopAuto();
+
+            const userName = currentUser ? (currentUser.fullName || currentUser.username || '') : '';
+            const planName = labelPlanType(selectedPlan.planType);
+            el.payOrderInfo.textContent =
+                `${userName} / 航班 Flight ${currentUser ? currentUser.flightId : ''} / ${planName}`;
+
+            el.payAmount.textContent = fmtTwd(selectedPlan.cost || 0);
+
+            clearPaymentForm();
+            el.payStatus.textContent = '此為示範畫面，不會真的進行扣款。';
+
+            el.paymentFormArea.style.display = 'block';
+            el.paymentResultArea.style.display = 'none';
+
+            el.loginSection.style.display = 'none';
+            el.profileSection.style.display = 'none';
+            el.mainSection.style.display = 'none';
+            el.planDetailSection.style.display = 'none';
+            el.paymentSection.style.display = 'block';
+        }
+
+        function clearPaymentForm() {
+            el.payCardNumber.value = '';
+            el.payCardExpiry.value = '';
+            el.payCardCvv.value = '';
+            el.payCardHolder.value = '';
+        }
+
+        // 付款頁返回方案詳情
+        function backToDetailFromPayment() {
+            clearPaymentForm();
+            el.payStatus.textContent = '此為示範畫面，不會真的進行扣款。';
+
+            el.paymentSection.style.display = 'none';
+            el.paymentFormArea.style.display = 'block';
+            el.paymentResultArea.style.display = 'none';
+
+            if (selectedPlan) {
+                el.planDetailSection.style.display = 'block';
+            } else if (currentUser && currentUser.profileCompleted) {
+                el.mainSection.style.display = 'block';
+                startAuto();
+            } else {
+                el.loginSection.style.display = 'block';
+            }
+        }
+
+        // Demo：送出付款（不串真實綠界），顯示「付款成功 + 方案細節」
+        function submitPaymentDemo() {
+            if (!selectedPlan) {
+                el.payStatus.innerHTML = '<span class="err">尚未選擇方案。</span>';
+                return;
+            }
+
+            const num = el.payCardNumber.value.replace(/\s+/g, '');
+            const exp = el.payCardExpiry.value.trim();
+            const cvv = el.payCardCvv.value.trim();
+            const holder = el.payCardHolder.value.trim();
+
+            if (!num || num.length < 12) {
+                el.payStatus.innerHTML = '<span class="err">請輸入正確的卡號（Demo）。</span>';
+                return;
+            }
+            if (!exp) {
+                el.payStatus.innerHTML = '<span class="err">請輸入有效期限。</span>';
+                return;
+            }
+            if (!cvv || cvv.length < 3) {
+                el.payStatus.innerHTML = '<span class="err">請輸入安全碼。</span>';
+                return;
+            }
+            if (!holder) {
+                el.payStatus.innerHTML = '<span class="err">請輸入持卡人姓名。</span>';
+                return;
+            }
+
+            // 模擬付款成功：隱藏表單，顯示結果 + 方案細節
+            el.paymentFormArea.style.display = 'none';
+            el.paymentResultArea.style.display = 'block';
+
+            el.payResultStatus.textContent = '付款成功，感謝您的使用。';
+
+            el.payResultPlanType.textContent = labelPlanType(selectedPlan.planType);
+            el.payResultArrivalTime.textContent = selectedPlan.arrivalTime || '—';
+            el.payResultCost.textContent = fmtTwd(selectedPlan.cost || 0);
+            el.payResultContent.textContent = selectedPlan.detail || '—';
+        }
+
+        // 付款成功頁返回主頁
+        function backToMainFromPaymentResult() {
+            el.paymentSection.style.display = 'none';
+            if (currentUser && currentUser.profileCompleted) {
+                el.mainSection.style.display = 'block';
+                startAuto();
+            } else {
+                el.loginSection.style.display = 'block';
+            }
         }
 
         function startAuto() {
             stopAuto();
+            if (!currentUser || currentUser.flightId == null) return;
+            fetchPlans();
             timer = setInterval(fetchPlans, POLL_MS);
-            el.autoBadge.textContent = '自動更新中';
         }
+
         function stopAuto() {
             if (timer) clearInterval(timer);
             timer = null;
-            el.autoBadge.textContent = '自動更新關閉';
         }
 
-        // 綁定事件
-        el.refreshBtn.addEventListener('click', fetchPlans);
-        el.flightId.addEventListener('change', fetchPlans);
+        // 頁籤隱藏時暫停輪詢
         document.addEventListener('visibilitychange', () => {
-            if (document.hidden) stopAuto(); else startAuto();
+            if (document.hidden) {
+                stopAuto();
+            } else {
+                if (currentUser && currentUser.flightId != null && el.mainSection.style.display === 'block') {
+                    startAuto();
+                }
+            }
         });
 
-        // 啟動
-        fetchPlans();
-        startAuto();
+        // 綁定登入事件
+        el.loginBtn.addEventListener('click', doLogin);
+        el.password.addEventListener('keydown', e => {
+            if (e.key === 'Enter') doLogin();
+        });
+
+        // 綁定儲存航班資料事件
+        el.profileSaveBtn.addEventListener('click', saveFlightProfile);
+
+        // 綁定「返回登入」按鈕
+        el.backToLoginFromProfile.addEventListener('click', showLogin);
+        el.backToLoginFromMain.addEventListener('click', showLogin);
+
+        // 詳情頁返回主頁
+        el.backToMainFromDetail.addEventListener('click', backToMainFromDetail);
+
+        // 詳情頁進入付款
+        el.goToPaymentBtn.addEventListener('click', goToPayment);
+
+        // 付款頁返回詳情
+        el.backToDetailFromPayment.addEventListener('click', backToDetailFromPayment);
+
+        // 付款送出（Demo）
+        el.paySubmitBtn.addEventListener('click', submitPaymentDemo);
+
+        // 付款成功頁返回主頁
+        el.backToMainFromPaymentResult.addEventListener('click', backToMainFromPaymentResult);
+
+        // 綁定價格拉桿事件（使用者調整時套用篩選，不會被輪詢重設）
+        el.priceSlider.addEventListener('input', () => {
+            if (!allPlans || allPlans.length === 0) {
+                el.priceLabel.textContent = '不限';
+                return;
+            }
+            const v = Number(el.priceSlider.value);
+            priceFilterMax = v;
+            el.priceLabel.textContent = '≤ ' + fmtTwd(v);
+
+            const filtered = applyPriceFilter();
+            renderPlans(filtered);
+            el.planCount.textContent = filtered.length;
+        });
+
+        // 初始化：尚未有方案時，先停用拉桿
+        el.priceSlider.disabled = true;
     </script>
 </body>
 
