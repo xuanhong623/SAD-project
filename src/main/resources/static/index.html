@@ -4,7 +4,7 @@
 <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <title>飛常不順｜主頁</title>
+    <title>飛常順｜主頁</title>
     <style>
         :root {
             font-family: ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto;
@@ -379,8 +379,9 @@
                         <pre id="payResultContent" style="margin:0;font-size:14px;white-space:pre-wrap;">—</pre>
                     </div>
 
-                    <div class="row" style="margin-top:16px;justify-content:flex-end;">
-                        <button id="backToMainFromPaymentResult" type="button">返回主頁</button>
+                    <div class="row" style="margin-top:16px;justify-content:space-between;">
+                        <button id="cancelPlanFromPaymentResult" type="button">取消此方案</button>
+                        <button id="backToMainFromPaymentResult" type="button">返回登入</button>
                     </div>
                 </div>
             </div>
@@ -458,6 +459,7 @@
             payResultCost: document.getElementById('payResultCost'),
             payResultContent: document.getElementById('payResultContent'),
             backToMainFromPaymentResult: document.getElementById('backToMainFromPaymentResult'),
+            cancelPlanFromPaymentResult: document.getElementById('cancelPlanFromPaymentResult'),
         };
 
         let timer = null;
@@ -602,10 +604,8 @@
             el.priceSlider.disabled = (minCost === maxCost);
 
             if (!keepUserSelection || priceFilterMax == null) {
-                // 第一次或尚未有使用者選擇 → 用最大值
                 priceFilterMax = maxCost;
             } else {
-                // 之後輪詢 → 保留使用者選擇，但限制在新範圍內
                 if (priceFilterMax < minCost) priceFilterMax = minCost;
                 if (priceFilterMax > maxCost) priceFilterMax = maxCost;
             }
@@ -886,8 +886,30 @@ ${escapeHtml(p.detail || '')}
             el.payResultContent.textContent = selectedPlan.detail || '—';
         }
 
-        // 付款成功頁返回主頁
+        // 付款成功頁：返回登入
         function backToMainFromPaymentResult() {
+            showLogin();
+        }
+
+        // 付款成功頁：取消此方案並回主頁重新選擇
+        function cancelPlanFromPaymentResult() {
+            if (!selectedPlan) {
+                alert('目前沒有選擇中的方案');
+                return;
+            }
+            const ok = confirm('確定要取消此方案嗎？');
+            if (!ok) return;
+
+            // 取消選取的方案（不改動方案列表，只是把目前選中的清掉）
+            selectedPlan = null;
+
+            // 重置付款區塊狀態
+            clearPaymentForm();
+            el.paymentFormArea.style.display = 'block';
+            el.paymentResultArea.style.display = 'none';
+            el.payStatus.textContent = '此為示範畫面，不會真的進行扣款。';
+
+            // 關閉付款頁，回到主頁讓使用者重新選擇方案
             el.paymentSection.style.display = 'none';
             if (currentUser && currentUser.profileCompleted) {
                 el.mainSection.style.display = 'block';
@@ -945,8 +967,11 @@ ${escapeHtml(p.detail || '')}
         // 付款送出（Demo）
         el.paySubmitBtn.addEventListener('click', submitPaymentDemo);
 
-        // 付款成功頁返回主頁
+        // 付款成功頁：返回登入
         el.backToMainFromPaymentResult.addEventListener('click', backToMainFromPaymentResult);
+
+        // 付款成功頁：取消此方案
+        el.cancelPlanFromPaymentResult.addEventListener('click', cancelPlanFromPaymentResult);
 
         // 綁定價格拉桿事件（使用者調整時套用篩選，不會被輪詢重設）
         el.priceSlider.addEventListener('input', () => {
