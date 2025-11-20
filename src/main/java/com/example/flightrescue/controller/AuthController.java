@@ -9,6 +9,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.example.flightrescue.database.DataBase;
 import com.example.flightrescue.model.LoginRequest;
 import com.example.flightrescue.model.User;
 import com.example.flightrescue.storage.InMemoryData;
@@ -27,21 +28,18 @@ public class AuthController {
 
         String username = loginRequest.getUsername();
 
-        Optional<User> userOpt = InMemoryData.users.stream()
-                .filter(u -> u.getUsername().equals(username))
-                .findFirst();
-
+        DataBase db = new DataBase();
         User user;
-        if (userOpt.isPresent()) {
-            // 已存在的使用者（可能已經填過航班資料，也可能還沒）
-            user = userOpt.get();
-        } else {
-            // 新的使用者：一開始沒有任何航班/飯店資料
-            user = new User(username);
-            InMemoryData.users.add(user);
+        try{
+            user = db.ReadUserData(username, DataBase.db);
+            if(user==null){
+                return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+            } 
+            return ResponseEntity.ok(user);
+        }catch(Exception e){
+            e.printStackTrace();
         }
-
         // 直接把 User 回傳（包含 profileCompleted 狀態）
-        return ResponseEntity.ok(user);
+        return null;
     }
 }

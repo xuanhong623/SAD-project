@@ -20,7 +20,7 @@ import java.io.IOException;
 
 public class DataBase {
 
-    private Firestore db;
+    public static Firestore db;
 
     //簡介
     // 要使用這個DataBase一定要初始化，真的
@@ -75,7 +75,7 @@ public class DataBase {
     }
 
     //讀取使用者資料庫：就是String你要的使用者名稱，就會回傳一個User物件
-    public User ReadUserData(String user /*使用者的username*/) throws Exception {
+    public User ReadUserData(String user /*使用者的username*/, Firestore db) throws Exception {
         DocumentSnapshot doc = db.collection("users").document(user).get().get();
 
         if (doc.exists()) {
@@ -83,14 +83,14 @@ public class DataBase {
             System.out.println("成功轉回物件：" + u.getUsername());
             return u;
         } else {
-            System.out.println("找不到文件！");
+            System.out.println("找不到使用者！");
             return null;
         }
     }
 
     //新增使用者資料：顧名思義，輸入一個User物件進去就會新增
     //如果有同樣username的話會覆蓋，不用擔心
-    public void InputUserData(User user) throws Exception {
+    public void InputUserData(User user, Firestore db) throws Exception {
         db.collection("users").document(user.getUsername()).set(user).get();
         System.out.println("使用者資料輸入成功！");
     }
