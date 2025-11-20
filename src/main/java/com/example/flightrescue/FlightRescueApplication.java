@@ -11,7 +11,6 @@ import org.springframework.scheduling.annotation.EnableScheduling;
 
 import com.example.flightrescue.database.DataBase;
 import com.example.flightrescue.model.Flight;
-import com.example.flightrescue.model.User;
 import com.example.flightrescue.storage.InMemoryData;
 
 import jakarta.annotation.PostConstruct;
