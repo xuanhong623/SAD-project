@@ -179,6 +179,18 @@ async function doLogin() {
         const user = await res.json();
         currentUser = user;
 
+        
+        const res2 = await fetch(`/dashboard/user-flight-name?newFlightId=${user.newFlightId}`);
+        if (!res2.ok) throw new Error("找不到 flightId");
+
+        const flight = await res2.json();
+        
+        // 如果 Flight 裡面還包含你的自訂 Status 物件
+        // 你可以直接用，例如：
+        // console.log(flight.status.delayMinutes);
+
+        
+
         // 登入後先隱藏登入頁、詳情頁、付款頁
         el.loginSection.style.display = 'none';
         el.planDetailSection.style.display = 'none';
@@ -189,7 +201,7 @@ async function doLogin() {
             el.profileSection.style.display = 'none';
             el.mainSection.style.display = 'block';
 
-            renderUserInfo(user); // 顯示使用者資訊
+            renderUserInfo(user,flight); // 顯示使用者資訊
             startAuto();          // 開始自動輪詢方案
             el.loginStatus.textContent = '登入成功';
         } else {
@@ -217,10 +229,11 @@ async function doLogin() {
 /**
  * 將 currentUser 的資料顯示在主頁的 banner
  */
-function renderUserInfo(user) {
+function renderUserInfo(user,flight) {
     el.userInfo.innerHTML = `
         <div><strong>${escapeHtml(user.fullName || user.username || '')}</strong></div>
-        <div>綁定航班：<span class="badge">Flight ${user.flightId}</span></div>
+        <div>綁定航班：<span class="badge">Flight ${escapeHtml(flight.flightName)}</span></div>
+        <div>從${escapeHtml(flight.fromCity || '')} 去 ${escapeHtml(flight.toCity || '')}</div>
         <div>飯店：${escapeHtml(user.hotelName || '—')}</div>
         <div>地址：${escapeHtml(user.hotelAddress || '—')}</div>
     `;
@@ -430,13 +443,18 @@ async function saveFlightProfile() {
         const user = await res.json();
         currentUser = user;
 
+        const res2 = await fetch(`/dashboard/user-flight-name?newFlightId=${user.newFlightId}`);
+        if (!res2.ok) throw new Error("找不到 flightId");
+
+        const flight = await res2.json();
+
         // 切換到主頁
         el.profileSection.style.display = 'none';
         el.planDetailSection.style.display = 'none';
         el.paymentSection.style.display = 'none';
         el.mainSection.style.display = 'block';
 
-        renderUserInfo(user);
+        renderUserInfo(user,flight);
         startAuto();
 
         el.statusText.textContent = '已載入航班與方案資料';

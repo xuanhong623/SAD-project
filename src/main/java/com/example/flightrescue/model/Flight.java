@@ -3,16 +3,22 @@ package com.example.flightrescue.model;
 import java.time.LocalDateTime;
 
 public class Flight {
-    private String name;
+    private String flightName;
+    //flightName
     private Long flightId;
+    private int newFlightId;
     private String fromCity;
     private String toCity;
     private LocalDateTime departTime;
     private String delayStatus = "normal"; // normal / delayed
     private boolean delayed = false;
 
-    public Flight(Long flightId, String fromCity, String toCity, LocalDateTime departTime) {
+    public Flight() {}
+
+    public Flight(Long flightId, String flightName, String fromCity, String toCity, LocalDateTime departTime) {
         this.flightId = flightId;
+        this.newFlightId = flightId.intValue();
+        this.flightName = flightName;
         this.fromCity = fromCity;
         this.toCity = toCity;
         this.departTime = departTime;
@@ -20,6 +26,14 @@ public class Flight {
 
     public Long getFlightId() {
         return flightId;
+    }
+
+    public int getNewFlightId() {
+        return newFlightId;
+    }
+
+    public String getFlightName() {
+        return flightName;
     }
 
     public String getFromCity() {

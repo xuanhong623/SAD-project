@@ -6,6 +6,7 @@ public class User {
     private String hotelName;
     private String hotelAddress;
     private Long flightId;
+    private int newFlightId;
 
     // 新增：是否已填完航班 / 飯店資料
     private boolean profileCompleted;
@@ -20,6 +21,7 @@ public class User {
         this.hotelName = hotelName;
         this.hotelAddress = hotelAddress;
         this.flightId = flightId;
+        this.newFlightId = flightId.intValue();
         // 只要建構子給了完整資料，就當作已完成設定
         this.profileCompleted = (fullName != null && hotelName != null && hotelAddress != null && flightId != null);
     }
@@ -34,6 +36,10 @@ public class User {
 
     public String getUsername() {
         return username;
+    }
+
+    public int getNewFlightId() {
+        return newFlightId;
     }
 
     public void setUsername(String username) {

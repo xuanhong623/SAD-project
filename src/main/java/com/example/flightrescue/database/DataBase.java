@@ -18,6 +18,8 @@ import java.util.Map;
 import java.util.concurrent.ExecutionException;
 import java.io.IOException;
 
+import com.example.flightrescue.model.Flight;
+
 public class DataBase {
 
     public static Firestore db;
@@ -49,6 +51,45 @@ public class DataBase {
         this.db = db;
     }
 
+    //讀取使用者資料庫：就是String你要的使用者名稱，就會回傳一個User物件
+    public User ReadUserData(String user /*使用者的username*/, Firestore db) throws Exception {
+        DocumentSnapshot doc = db.collection("users").document(user).get().get();
+
+        if (doc.exists()) {
+            User u = doc.toObject(User.class);
+            System.out.println("成功轉回使用者物件：" + u.getUsername());
+            return u;
+        } else {
+            System.out.println("找不到使用者！");
+            return null;
+        }
+    }
+
+    //新增使用者資料：顧名思義，輸入一個User物件進去就會新增
+    //如果有同樣username的話會覆蓋，不用擔心
+    public void InputUserData(User user, Firestore db) throws Exception {
+        db.collection("users").document(user.getUsername()).set(user).get();
+        System.out.println("使用者資料輸入成功！");
+    }
+
+    public Flight ReadFlightData(int newFlightId, Firestore db) throws Exception {
+        DocumentSnapshot doc = db.collection("flights").document(String.valueOf(newFlightId)).get().get();
+
+        if (doc.exists()) {
+            Flight f = doc.toObject(Flight.class);
+            System.out.println("成功轉回航班物件：" + f.getFlightId());
+            return f;
+        } else {
+            System.out.println("找不到航班！");
+            return null;
+        }
+    }
+
+    public void InputFlightData(Flight flight, Firestore db) throws Exception {
+        db.collection("flights").document(flight.getFlightId().toString()).set(flight).get();
+        System.out.println("航班資料輸入成功！");
+    }
+
     //建立使用者資料庫
     //不要用這個，這個我已經建立過一次了，所以不要用
     public void CreateUserData() throws Exception {
@@ -71,29 +112,19 @@ public class DataBase {
         db.collection("users").document("demo995").set(new User("demo995")).get();
 
         System.out.println("使用者資料庫建立成功！");
-
     }
 
-    //讀取使用者資料庫：就是String你要的使用者名稱，就會回傳一個User物件
-    public User ReadUserData(String user /*使用者的username*/, Firestore db) throws Exception {
-        DocumentSnapshot doc = db.collection("users").document(user).get().get();
+    public void CreateFlightData() throws Exception {
+        // Firestore 自動將物件轉成文件欄位
+        db.collection("flights").document("1").set(new Flight(1L, "JX726", "TPE", "KIX", null)).get();
+        db.collection("flights").document("2").set(new Flight(2L, "JX718", "TPE", "NRT", null)).get();
+        db.collection("flights").document("3").set(new Flight(3L, "JX704", "TSA", "HND", null)).get();
+        db.collection("flights").document("4").set(new Flight(4L, "JX839", "KHH", "HKG", null)).get();
+        db.collection("flights").document("5").set(new Flight(5L, "JX206", "TPE", "SIN", null)).get();
 
-        if (doc.exists()) {
-            User u = doc.toObject(User.class);
-            System.out.println("成功轉回物件：" + u.getUsername());
-            return u;
-        } else {
-            System.out.println("找不到使用者！");
-            return null;
-        }
+        System.out.println("航班資料庫建立成功！");
     }
 
-    //新增使用者資料：顧名思義，輸入一個User物件進去就會新增
-    //如果有同樣username的話會覆蓋，不用擔心
-    public void InputUserData(User user, Firestore db) throws Exception {
-        db.collection("users").document(user.getUsername()).set(user).get();
-        System.out.println("使用者資料輸入成功！");
-    }
 
     // 下面是Sample，你們不用管這些，我給我自己看得
 
@@ -147,19 +178,19 @@ public class DataBase {
     }
 
         //建立資料使用，後續不要理這段
-    // public static void main(String[] args) {
-    //     Init init = new Init();
-    //     try {
-    //         init.init();
-    //         init.CreateUserData();
-    //         init.ReadUserData("demo001");
-    //         // init.CreateDataSample();
-    //         // init.InputDataSample();
-    //         // init.ReadDataSample();
-    //     } catch (Exception e) {
-    //         e.printStackTrace();
-    //     }
-    // }
+    public static void main(String[] args) {
+        DataBase db = new DataBase();
+        try {
+            db.Init();
+            db.CreateFlightData();
+            db.CreateUserData();
+            // init.CreateDataSample();
+            // init.InputDataSample();
+            // init.ReadDataSample();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
 
 
 
