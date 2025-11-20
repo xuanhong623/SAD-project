@@ -3,7 +3,7 @@ package com.example.flightrescue.model;
 import java.time.LocalDateTime;
 
 public class Flight {
-
+    private String name;
     private Long flightId;
     private String fromCity;
     private String toCity;
