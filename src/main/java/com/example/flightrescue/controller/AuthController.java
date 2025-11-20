@@ -1,7 +1,5 @@
 package com.example.flightrescue.controller;
 
-import java.util.Optional;
-
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -12,7 +10,6 @@ import org.springframework.web.bind.annotation.RestController;
 import com.example.flightrescue.database.DataBase;
 import com.example.flightrescue.model.LoginRequest;
 import com.example.flightrescue.model.User;
-import com.example.flightrescue.storage.InMemoryData;
 
 @RestController
 @RequestMapping("/api")

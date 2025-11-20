@@ -1,7 +1,6 @@
 package com.example.flightrescue.database;
 
 import com.example.flightrescue.model.User;
-import com.example.flightrescue.storage.InMemoryData;
 import com.google.api.core.ApiFuture;
 import com.google.auth.oauth2.GoogleCredentials;
 import com.google.cloud.firestore.DocumentReference;
@@ -15,7 +14,6 @@ import com.google.firebase.cloud.FirestoreClient;
 import java.io.InputStream;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.concurrent.ExecutionException;
 import java.io.IOException;
 
 import com.example.flightrescue.model.Flight;
@@ -48,7 +46,7 @@ public class DataBase {
 
         System.out.println("Firebase 成功初始化！");
 
-        this.db = db;
+        DataBase.db = db;
     }
 
     //讀取使用者資料庫：就是String你要的使用者名稱，就會回傳一個User物件
@@ -178,19 +176,19 @@ public class DataBase {
     }
 
         //建立資料使用，後續不要理這段
-    public static void main(String[] args) {
-        DataBase db = new DataBase();
-        try {
-            db.Init();
-            db.CreateFlightData();
-            db.CreateUserData();
-            // init.CreateDataSample();
-            // init.InputDataSample();
-            // init.ReadDataSample();
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-    }
+    // public static void main(String[] args) {
+    //     DataBase db = new DataBase();
+    //     try {
+    //         db.Init();
+    //         db.CreateFlightData();
+    //         db.CreateUserData();
+    //         // init.CreateDataSample();
+    //         // init.InputDataSample();
+    //         // init.ReadDataSample();
+    //     } catch (Exception e) {
+    //         e.printStackTrace();
+    //     }
+    // }
 
 
 
