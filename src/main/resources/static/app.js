@@ -180,10 +180,7 @@ async function doLogin() {
         currentUser = user;
 
         
-        const res2 = await fetch(`/dashboard/user-flight-name?newFlightId=${user.newFlightId}`);
-        if (!res2.ok) throw new Error("找不到 flightId");
-
-        const flight = await res2.json();
+        
         
         // 如果 Flight 裡面還包含你的自訂 Status 物件
         // 你可以直接用，例如：
@@ -200,6 +197,11 @@ async function doLogin() {
             // 已經填過航班 + 飯店資料，直接進主頁
             el.profileSection.style.display = 'none';
             el.mainSection.style.display = 'block';
+
+            const res2 = await fetch(`/dashboard/user-flight-name?newFlightId=${user.newFlightId}`);
+            if (!res2.ok) throw new Error("找不到 flightId");
+
+            const flight = await res2.json();
 
             renderUserInfo(user,flight); // 顯示使用者資訊
             startAuto();          // 開始自動輪詢方案
