@@ -19,7 +19,7 @@
                  區塊 1：登入頁面
                  ========================= -->
             <div id="loginSection">
-                <h1>飛常不順｜登入</h1>
+                <h1>飛常順｜登入</h1>
 
                 <!-- 帳號輸入列 -->
                 <div class="row" style="margin-bottom:12px;">
@@ -86,7 +86,7 @@
             <div id="mainSection" style="display:none;">
                 <!-- 標題列：主標題 + 返回登入 -->
                 <div class="row" style="justify-content:space-between;align-items:center;margin-bottom:8px;">
-                    <h1 style="margin-bottom:0;">飛常不順｜主頁</h1>
+                    <h1 style="margin-bottom:0;">飛常順｜主頁</h1>
                     <!-- 主頁返回登入按鈕 -->
                     <button id="backToLoginFromMain" type="button">返回登入</button>
                 </div>
@@ -123,6 +123,11 @@
 
                 <!-- 方案載入 / 更新狀態 -->
                 <div class="status" id="statusText">等待資料…</div>
+
+                <!-- 手動更新方案按鈕 -->
+                <div class="row" style="margin-top:8px; justify-content:flex-end;">
+                    <button id="refreshPlansBtn" type="button">重新整理</button>
+                </div>
 
                 <!-- 方案清單表 -->
                 <table id="plansTable" style="display:none;">
