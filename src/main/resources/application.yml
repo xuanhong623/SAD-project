@@ -1,0 +1,5 @@
+plan:
+  rank:
+    weight-price: 0.3
+    weight-rating: 0.8
+    weight-drive: 0.1
