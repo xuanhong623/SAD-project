@@ -1,6 +1,7 @@
 package com.example.flightrescue.database;
 
 import com.example.flightrescue.model.User;
+import com.example.flightrescue.storage.InMemoryData;
 import com.google.api.core.ApiFuture;
 import com.google.auth.oauth2.GoogleCredentials;
 import com.google.cloud.firestore.DocumentReference;
@@ -93,7 +94,7 @@ public class DataBase {
     public void CreateUserData() throws Exception {
         // Firestore 自動將物件轉成文件欄位
         db.collection("users").document("demo001").set(new User("demo001", "王小明", "大阪難波飯店", "大阪市中央區xxxx路", 1L)).get();
-        db.collection("users").document("demo002").set(new User("demo001", "王小明", "大阪難波飯店", "大阪市中央區xxxx路", 1L)).get();
+        db.collection("users").document("demo002").set(new User("demo002", "陳美玲", "東京新宿飯店", "東京都新宿區xxxx路",2L)).get();        
         db.collection("users").document("demo003").set(new User("demo003", "林志宏", "名古屋榮飯店", "名古屋市中區xxxx路", 3L)).get();
         db.collection("users").document("demo004").set(new User("demo004", "張雅惠", "福岡天神飯店", "福岡市中央區xxxx路", 4L)).get();
         db.collection("users").document("demo005").set(new User("demo005", "李建國", "札幌大通飯店", "札幌市中央區xxxx路", 5L)).get();
