@@ -386,6 +386,8 @@ async function saveFlightProfile() {
         const user = await res.json();
         currentUser = user;
 
+        
+
         const res2 = await fetch(`/dashboard/user-flight-name?newFlightId=${user.newFlightId}`);
         if (!res2.ok) throw new Error('找不到 flightId');
 

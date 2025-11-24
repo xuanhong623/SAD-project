@@ -9,6 +9,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.example.flightrescue.database.DataBase;
 import com.example.flightrescue.model.FlightProfileRequest;
 import com.example.flightrescue.model.User;
 import com.example.flightrescue.storage.InMemoryData;
@@ -22,21 +23,33 @@ public class UserProfileController {
             @PathVariable String username,
             @RequestBody FlightProfileRequest req) {
 
-        Optional<User> userOpt = InMemoryData.users.stream()
-                .filter(u -> u.getUsername().equals(username))
-                .findFirst();
+        // Optional<User> userOpt = InMemoryData.users.stream()
+        //         .filter(u -> u.getUsername().equals(username))
+        //         .findFirst();
 
-        if (!userOpt.isPresent()) {
-            return ResponseEntity.notFound().build();
+        DataBase db = new DataBase();
+        try{
+            User user = new User(username, req.getFullName(), req.getHotelName(), req.getHotelAddress(), req.getFlightId());
+            db.InputUserData(user, DataBase.db);
+            return ResponseEntity.ok(user);
+
+        }catch(Exception e){
+            e.printStackTrace();
         }
 
-        User user = userOpt.get();
-        user.setFullName(req.getFullName());
-        user.setHotelName(req.getHotelName());
-        user.setHotelAddress(req.getHotelAddress());
-        user.setFlightId(req.getFlightId());
-        user.setProfileCompleted(true);
+        // if (!userOpt.isPresent()) {
+        //     return ResponseEntity.notFound().build();
+        // }
 
-        return ResponseEntity.ok(user);
+
+
+        // User user = userOpt.get();
+        // user.setFullName(req.getFullName());
+        // user.setHotelName(req.getHotelName());
+        // user.setHotelAddress(req.getHotelAddress());
+        // user.setFlightId(req.getFlightId());
+        // user.setProfileCompleted(true);
+        return null;
+
     }
 }
