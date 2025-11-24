@@ -1,7 +1,12 @@
 package com.example.flightrescue.database;
 
+import java.io.IOException;
+import java.io.InputStream;
+import java.util.HashMap;
+import java.util.Map;
+
+import com.example.flightrescue.model.Flight;
 import com.example.flightrescue.model.User;
-import com.example.flightrescue.storage.InMemoryData;
 import com.google.api.core.ApiFuture;
 import com.google.auth.oauth2.GoogleCredentials;
 import com.google.cloud.firestore.DocumentReference;
@@ -12,23 +17,15 @@ import com.google.firebase.FirebaseApp;
 import com.google.firebase.FirebaseOptions;
 import com.google.firebase.cloud.FirestoreClient;
 
-import java.io.InputStream;
-import java.util.HashMap;
-import java.util.Map;
-import java.io.IOException;
-
-import com.example.flightrescue.model.Flight;
-
 public class DataBase {
 
     public static Firestore db;
 
-    //簡介
+    // 簡介
     // 要使用這個DataBase一定要初始化，真的
     // 目前都只有使用者資料庫
     // 要Flight的話，我再弄，找我就行
     // 嘿嘿嘿ㄏㄟ ，我要寫到中風了
-
 
     // 初始化資料庫，只要執行一次，但一定要
     public void Init() throws IOException {
@@ -50,8 +47,8 @@ public class DataBase {
         DataBase.db = db;
     }
 
-    //讀取使用者資料庫：就是String你要的使用者名稱，就會回傳一個User物件
-    public User ReadUserData(String user /*使用者的username*/, Firestore db) throws Exception {
+    // 讀取使用者資料庫：就是String你要的使用者名稱，就會回傳一個User物件
+    public User ReadUserData(String user /* 使用者的username */, Firestore db) throws Exception {
         DocumentSnapshot doc = db.collection("users").document(user).get().get();
 
         if (doc.exists()) {
@@ -64,8 +61,8 @@ public class DataBase {
         }
     }
 
-    //新增使用者資料：顧名思義，輸入一個User物件進去就會新增
-    //如果有同樣username的話會覆蓋，不用擔心
+    // 新增使用者資料：顧名思義，輸入一個User物件進去就會新增
+    // 如果有同樣username的話會覆蓋，不用擔心
     public void InputUserData(User user, Firestore db) throws Exception {
         db.collection("users").document(user.getUsername()).set(user).get();
         System.out.println("使用者資料輸入成功！");
@@ -89,20 +86,43 @@ public class DataBase {
         System.out.println("航班資料輸入成功！");
     }
 
-    //建立使用者資料庫
-    //不要用這個，這個我已經建立過一次了，所以不要用
+    // 建立使用者資料庫
+    // 不要用這個，這個我已經建立過一次了，所以不要用
     public void CreateUserData() throws Exception {
         // Firestore 自動將物件轉成文件欄位
-        db.collection("users").document("demo001").set(new User("demo001", "王小明", "大阪難波飯店", "大阪市中央區xxxx路", 1L)).get();
-        db.collection("users").document("demo002").set(new User("demo002", "陳美玲", "東京新宿飯店", "東京都新宿區xxxx路",2L)).get();        
-        db.collection("users").document("demo003").set(new User("demo003", "林志宏", "名古屋榮飯店", "名古屋市中區xxxx路", 3L)).get();
-        db.collection("users").document("demo004").set(new User("demo004", "張雅惠", "福岡天神飯店", "福岡市中央區xxxx路", 4L)).get();
-        db.collection("users").document("demo005").set(new User("demo005", "李建國", "札幌大通飯店", "札幌市中央區xxxx路", 5L)).get();
-        db.collection("users").document("demo006").set(new User("demo006", "黃俊傑", "沖繩國際通飯店", "那霸市牧志xxxx路", 6L)).get();
-        db.collection("users").document("demo007").set(new User("demo007", "周怡君", "京都四條飯店", "京都市中京區xxxx路", 7L)).get();
-        db.collection("users").document("demo008").set(new User("demo008", "蔡宗翰", "橫濱海濱飯店", "橫濱市中區xxxx路", 8L)).get();
-        db.collection("users").document("demo009").set(new User("demo009", "許淑芬", "神戶三宮飯店", "神戶市中央區xxxx路", 9L)).get();
-        db.collection("users").document("demo010").set(new User("demo010", "吳宗賢", "金澤車站飯店", "金澤市此花町xxxx路", 10L)).get();
+        db.collection("users").document("demo001").set(
+                new User("demo001", "王小明", "東京新宿商務飯店", "東京都新宿區西新宿1-3-5", 1L)).get();
+
+        db.collection("users").document("demo002").set(
+                new User("demo002", "陳美玲", "東京銀座精品飯店", "東京都中央區銀座2-4-8", 2L)).get();
+
+        // 羽田機場附近
+        db.collection("users").document("demo003").set(
+                new User("demo003", "林志宏", "羽田機場國際航站飯店", "東京都大田區羽田空港2-6-5", 3L)).get();
+
+        db.collection("users").document("demo004").set(
+                new User("demo004", "張雅惠", "東京池袋城市飯店", "東京都豐島區東池袋3-8-5", 4L)).get();
+
+        db.collection("users").document("demo005").set(
+                new User("demo005", "李建國", "東京上野精選飯店", "東京都台東區上野7-2-6", 5L)).get();
+
+        // 羽田機場附近
+        db.collection("users").document("demo006").set(
+                new User("demo006", "王小明", "羽田機場快捷飯店", "東京都大田區羽田1-2-1", 6L)).get();
+
+        db.collection("users").document("demo007").set(
+                new User("demo007", "陳美玲", "東京澀谷站前飯店", "東京都澀谷區道玄坂1-12-9", 7L)).get();
+
+        // 羽田機場附近（第三筆）
+        db.collection("users").document("demo008").set(
+                new User("demo008", "林志宏", "羽田天空之橋飯店", "東京都大田區羽田5-18-1", 8L)).get();
+
+        db.collection("users").document("demo009").set(
+                new User("demo009", "張雅惠", "東京六本木設計飯店", "東京都港區六本木5-16-3", 9L)).get();
+
+        db.collection("users").document("demo010").set(
+                new User("demo010", "李建國", "東京丸之內車站飯店", "東京都千代田區丸之內1-7-12", 10L)).get();
+
         // 新增一個沒有航班資料的帳號 demo999，登入後會被導向資料輸入頁
         db.collection("users").document("demo999").set(new User("demo999")).get();
         db.collection("users").document("demo998").set(new User("demo998")).get();
@@ -115,15 +135,25 @@ public class DataBase {
 
     public void CreateFlightData() throws Exception {
         // Firestore 自動將物件轉成文件欄位
-        db.collection("flights").document("1").set(new Flight(1L, "JX726", "TPE", "KIX", null)).get();
-        db.collection("flights").document("2").set(new Flight(2L, "JX718", "TPE", "NRT", null)).get();
-        db.collection("flights").document("3").set(new Flight(3L, "JX704", "TSA", "HND", null)).get();
-        db.collection("flights").document("4").set(new Flight(4L, "JX839", "KHH", "HKG", null)).get();
-        db.collection("flights").document("5").set(new Flight(5L, "JX206", "TPE", "SIN", null)).get();
+        // 桃園（TPE） → 羽田（HND）的酷航航班（5 筆）
+
+        db.collection("flights").document("1").set(
+                new Flight(1L, "TR892", "TPE", "HND", null)).get();
+
+        db.collection("flights").document("2").set(
+                new Flight(2L, "TR894", "TPE", "HND", null)).get();
+
+        db.collection("flights").document("3").set(
+                new Flight(3L, "TR896", "TPE", "HND", null)).get();
+
+        db.collection("flights").document("4").set(
+                new Flight(4L, "TR898", "TPE", "HND", null)).get();
+
+        db.collection("flights").document("5").set(
+                new Flight(5L, "TR880", "TPE", "HND", null)).get();
 
         System.out.println("航班資料庫建立成功！");
     }
-
 
     // 下面是Sample，你們不用管這些，我給我自己看得
 
@@ -176,24 +206,20 @@ public class DataBase {
         }
     }
 
-        //建立資料使用，後續不要理這段
+    // 建立資料使用，後續不要理這段
     // public static void main(String[] args) {
-    //     DataBase db = new DataBase();
-    //     try {
-    //         db.Init();
-    //         db.CreateFlightData();
-    //         db.CreateUserData();
-    //         // init.CreateDataSample();
-    //         // init.InputDataSample();
-    //         // init.ReadDataSample();
-    //     } catch (Exception e) {
-    //         e.printStackTrace();
-    //     }
+    // DataBase db = new DataBase();
+    // try {
+    // db.Init();
+    // db.CreateFlightData();
+    // db.CreateUserData();
+    // // init.CreateDataSample();
+    // // init.InputDataSample();
+    // // init.ReadDataSample();
+    // } catch (Exception e) {
+    // e.printStackTrace();
+    // }
     // }
 
-
-
-
-
-    //就說不用看，看甚麼，給我上去
+    // 就說不用看，看甚麼，給我上去
 }

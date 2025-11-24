@@ -33,11 +33,22 @@ public class FlightRescueApplication {
                         e.printStackTrace();
                 }
                 // 航班資料
-                InMemoryData.flights.add(new Flight(1L, "JX726", "TPE", "KIX", LocalDateTime.now().minusMinutes(40))); // 一開始就延誤
-                InMemoryData.flights.add(new Flight(2L, "JX718", "TPE", "NRT", LocalDateTime.now().minusMinutes(70))); // 3 秒後延誤
-                InMemoryData.flights.add(new Flight(3L, "JX704", "TSA", "HND", LocalDateTime.now().plusHours(1))); // 10 秒後延誤
-                InMemoryData.flights.add(new Flight(4L, "JX839", "KHH", "HKG", LocalDateTime.now().minusMinutes(10))); // 一開始延誤
-                InMemoryData.flights.add(new Flight(5L, "JX206", "TPE", "SIN", LocalDateTime.now().plusHours(2))); // 不延誤
+                // 桃園（TPE） → 羽田（HND）的酷航航班（示例 5 筆）
+
+                InMemoryData.flights.add(
+                                new Flight(1L, "TR892", "TPE", "HND", LocalDateTime.now().minusMinutes(30))); // 一開始就延誤
+
+                InMemoryData.flights.add(
+                                new Flight(2L, "TR894", "TPE", "HND", LocalDateTime.now().minusMinutes(5))); // 一開始延誤
+
+                InMemoryData.flights.add(
+                                new Flight(3L, "TR896", "TPE", "HND", LocalDateTime.now().plusMinutes(45))); // 5 秒後延誤
+
+                InMemoryData.flights.add(
+                                new Flight(4L, "TR898", "TPE", "HND", LocalDateTime.now().plusHours(1))); // 10 秒後延誤
+
+                InMemoryData.flights.add(
+                                new Flight(5L, "TR880", "TPE", "HND", LocalDateTime.now().plusHours(2))); // 不延誤
 
                 // 使用者資料
                 // InMemoryData.users.add(new User("demo001", "王小明", "大阪難波飯店", "大阪市中央區xxxx路",
