@@ -183,7 +183,7 @@ async function doLogin() {
             el.profileHotelAddress.value = user.hotelAddress || '';
             el.profileFlightId.value = user.flightId != null ? user.flightId : '';
 
-            el.profileStatus.textContent = '請先完成航班與飯店資料設定';
+            el.profileStatus.textContent = '請先完成航班資料設定';
         }
     } catch (e) {
         el.loginStatus.textContent = `登入失敗：${e.message}`;
@@ -197,8 +197,7 @@ function renderUserInfo(user, flight) {
         <div><strong>${escapeHtml(user.fullName || user.username || '')}</strong></div>
         <div>綁定航班：<span class="badge">Flight ${escapeHtml(flight.flightName)}</span></div>
         <div>從${escapeHtml(flight.fromCity || '')} 去 ${escapeHtml(flight.toCity || '')}</div>
-        <div>飯店：${escapeHtml(user.hotelName || '—')}</div>
-        <div>地址：${escapeHtml(user.hotelAddress || '—')}</div>
+
     `;
 }
 
@@ -353,12 +352,12 @@ async function saveFlightProfile() {
 
     const body = {
         fullName: el.profileFullName.value.trim(),
-        hotelName: el.profileHotelName.value.trim(),
-        hotelAddress: el.profileHotelAddress.value.trim(),
+        hotelName: "預設飯店",          // ← 自動填入
+        hotelAddress: "預設地址",       // ← 自動填入
         flightId: el.profileFlightId.value ? Number(el.profileFlightId.value) : null,
     };
 
-    if (!body.fullName || !body.hotelName || !body.hotelAddress || !body.flightId) {
+    if (!body.fullName || !body.flightId) {
         el.profileStatus.innerHTML = '<span class="err">請完整填寫所有欄位</span>';
         return;
     }
@@ -386,7 +385,7 @@ async function saveFlightProfile() {
         const user = await res.json();
         currentUser = user;
 
-        
+
 
         const res2 = await fetch(`/dashboard/user-flight-name?newFlightId=${user.newFlightId}`);
         if (!res2.ok) throw new Error('找不到 flightId');
